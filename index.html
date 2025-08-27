@@ -1,275 +1,507 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MyBook — Social Feed (Demo)</title>
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:#f0f2f5;color:#1c1e21}
-    a{color:inherit;text-decoration:none}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classic Nokia Snake Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .topbar{height:60px;background:#4267B2;color:white;display:flex;align-items:center;padding:0 16px;gap:12px;position:sticky;top:0;z-index:10}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
-    .brand .logo{width:36px;height:36px;border-radius:6px;background:linear-gradient(135deg,#ff6a00,#ffcc00);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #00ff00;
+        }
 
-    .topbar .search{flex:1;display:flex;justify-content:center}
-    .search input{width:60%;max-width:520px;padding:8px 12px;border-radius:20px;border:none;outline:none}
+        .game-container {
+            background: #000;
+            border: 8px solid #444;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.2),
+                        0 0 60px rgba(0, 255, 0, 0.1),
+                        0 0 100px rgba(0, 255, 0, 0.05);
+        }
 
-    .top-actions{display:flex;gap:10px;align-items:center}
-    .icon-btn{background:rgba(255,255,255,0.15);padding:8px 12px;border-radius:8px;cursor:pointer}
+        .nokia-frame {
+            background: linear-gradient(145deg, #444, #222);
+            border-radius: 12px;
+            padding: 25px;
+            border: 4px solid #666;
+        }
 
-    .container{display:grid;grid-template-columns:260px 1fr 320px;gap:20px;max-width:1150px;margin:18px auto;padding:0 12px}
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #111;
+            border-radius: 8px;
+            border: 2px solid #333;
+        }
 
-    .card{background:white;border-radius:10px;padding:14px;box-shadow:0 1px 2px rgba(0,0,0,0.05)}
-    .profile-mini{display:flex;gap:12px;align-items:center}
-    .avatar{width:56px;height:56px;border-radius:50%;object-fit:cover}
-    .name{font-weight:700}
-    .small-muted{color:#666;font-size:13px}
-    .menu{margin-top:12px;display:flex;flex-direction:column;gap:8px}
-    .menu a{padding:8px;border-radius:8px;color:#1c1e21}
-    .menu a:hover{background:#f0f2f5}
+        .game-title {
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+        }
 
-    .composer{display:flex;gap:12px;align-items:flex-start}
-    .composer textarea{flex:1;border-radius:10px;padding:12px;border:1px solid #e1e3e6;min-height:64px;resize:vertical}
-    .composer .composer-actions{display:flex;flex-direction:column;gap:8px}
-    .btn{padding:8px 12px;border-radius:8px;border:none;background:#1877F2;color:white;cursor:pointer}
-    .btn:hover{background:#165fce}
-    .post{margin-top:16px}
-    .post .post-head{display:flex;gap:12px;align-items:center}
-    .post .post-body{margin-top:10px;font-size:15px;line-height:1.45}
-    .post .post-media{margin-top:10px;border-radius:8px;overflow:hidden}
-    .meta{color:#65676b;font-size:13px}
-    .reactions{display:flex;gap:12px;margin-top:10px;color:#65676b}
-    .reactions button{background:transparent;border:none;cursor:pointer;padding:6px 8px;border-radius:6px}
-    .reactions button:hover{background:#f0f2f5}
+        .score-board {
+            background: #222;
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: 2px solid #333;
+            font-size: 14px;
+            font-weight: bold;
+        }
 
-    .comment-section{margin-top:12px;border-top:1px solid #eee;padding-top:8px}
-    .comment{display:flex;gap:8px;margin-top:8px}
-    .comment-input{flex:1;border-radius:20px;border:1px solid #ddd;padding:6px 12px}
+        .game-canvas-container {
+            position: relative;
+            border: 3px solid #333;
+            background: #111;
+            border-radius: 5px;
+        }
 
-    .trending-item{padding:8px 0;border-bottom:1px solid #f1f2f3}
-    .trending-item:last-child{border-bottom:none}
+        canvas {
+            display: block;
+            background: #000;
+            border-radius: 3px;
+        }
 
-    @media (max-width:1000px){
-      .container{grid-template-columns:1fr;max-width:760px}
-      .topbar .search input{width:90%}
-      .top-actions{display:none}
-    }
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
 
-    .timestamp{color:#8a8d91;font-size:12px}
-    .pill{display:inline-block;padding:6px 8px;border-radius:999px;background:#eef3ff;color:#2d56a6;font-weight:600;font-size:12px}
-  </style>
+        .mobile-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+
+        .control-btn {
+            background: #333;
+            border: 2px solid #00ff00;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: #00ff00;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: #00ff00;
+            color: #000;
+        }
+
+        .up { grid-column: 2; grid-row: 1; }
+        .left { grid-column: 1; grid-row: 2; }
+        .right { grid-column: 3; grid-row: 2; }
+        .down { grid-column: 2; grid-row: 3; }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 10px;
+            border: 3px solid #ff4444;
+            text-align: center;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+
+        .game-over h2 {
+            color: #ff4444;
+            font-size: 24px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .final-score {
+            color: #00ff00;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .restart-btn {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .restart-btn:hover {
+            background: #00cc00;
+            transform: scale(1.05);
+        }
+
+        .instructions {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                transform: scale(0.9);
+                margin: 20px;
+            }
+            
+            .mobile-controls {
+                display: grid;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-controls {
+                display: none;
+            }
+            
+            .instructions {
+                display: none;
+            }
+        }
+
+        .snake-segment {
+            position: absolute;
+            background: #00ff00;
+            border-radius: 3px;
+        }
+
+        .food {
+            position: absolute;
+            background: #ff4444;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+    </style>
 </head>
 <body>
-  <div class="topbar">
-    <div class="brand">
-      <div class="logo">MB</div>
-      <div>MyBook</div>
+    <div class="game-container">
+        <div class="nokia-frame">
+            <div class="game-header">
+                <div class="game-title">Nokia Snake</div>
+                <div class="score-board">Score: <span id="score">0</span></div>
+            </div>
+            
+            <div class="game-canvas-container">
+                <canvas id="gameCanvas" width="300" height="300"></canvas>
+                
+                <div id="gameOver" class="game-over">
+                    <h2>Game Over!</h2>
+                    <div class="final-score">Final Score: <span id="finalScore">0</span></div>
+                    <button class="restart-btn" onclick="restartGame()">Play Again</button>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <div class="mobile-controls">
+                    <button class="control-btn up" onclick="setDirection('up')">↑</button>
+                    <button class="control-btn left" onclick="setDirection('left')">←</button>
+                    <button class="control-btn right" onclick="setDirection('right')">→</button>
+                    <button class="control-btn down" onclick="setDirection('down')">↓</button>
+                </div>
+            </div>
+            
+            <div class="instructions">
+                Use arrow keys or touch controls to move
+            </div>
+        </div>
     </div>
 
-    <div class="search">
-      <input type="search" placeholder="Search MyBook" aria-label="Search">
-    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const finalScoreElement = document.getElementById('finalScore');
+        const gameOverElement = document.getElementById('gameOver');
 
-    <div class="top-actions">
-      <div class="icon-btn">Home</div>
-      <div class="icon-btn">Profile</div>
-      <div class="icon-btn">Messages</div>
-      <div class="icon-btn">Notifications</div>
-      <div class="icon-btn">Settings</div>
-    </div>
-  </div>
+        // Game constants
+        const GRID_SIZE = 20;
+        const GRID_WIDTH = canvas.width / GRID_SIZE;
+        const GRID_HEIGHT = canvas.height / GRID_SIZE;
+        const GAME_SPEED = 150;
 
-  <div class="container">
-    <aside>
-      <div class="card">
-        <div class="profile-mini">
-          <!-- Replace src with your actual photo file or URL -->
-          <img class="avatar" src="amanprofile.jpg" alt="Aman Das">
-          <div>
-            <div class="name">Aman Das</div>
-            <div class="small-muted">View profile</div>
-          </div>
-        </div>
-        <div class="menu">
-          <a href="#">Friends</a>
-          <a href="#">Groups</a>
-          <a href="#">Marketplace</a>
-          <a href="#">Saved</a>
-          <a href="#">Pages</a>
-          <a href="#">Events</a>
-          <a href="#">Memories</a>
-        </div>
-      </div>
+        // Game state
+        let snake = [];
+        let food = {};
+        let direction = 'right';
+        let nextDirection = 'right';
+        let score = 0;
+        let gameRunning = false;
+        let gameLoop;
 
-      <div class="card" style="margin-top:12px">
-        <div style="font-weight:700;margin-bottom:8px">Shortcuts</div>
-        <div class="small-muted">Your most visited groups & pages</div>
-        <div style="margin-top:10px;display:flex;gap:8px;flex-direction:column">
-          <a href="#">Design Club</a>
-          <a href="#">PUBG Squad</a>
-          <a href="#">College Noticeboard</a>
-          <a href="#">Photography Hub</a>
-        </div>
-      </div>
-    </aside>
-
-    <main>
-      <div class="card">
-        <div class="composer">
-          <img class="avatar" src="my-photo.jpg" alt="Aman Das">
-          <div style="flex:1">
-            <textarea id="composerText" placeholder="What's on your mind? (demo)" aria-label="Create post"></textarea>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-              <div style="display:flex;gap:8px;align-items:center">
-                <button class="pill" id="photoBtn">Photo</button>
-                <button class="pill" id="checkinBtn">Check in</button>
-                <button class="pill" id="tagBtn">Tag Friends</button>
-              </div>
-              <div class="composer-actions">
-                <button class="btn" id="postBtn">Post</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="feed">
-        <article class="card post">
-          <div class="post-head">
-            <div class="avatar">JS</div>
-            <div>
-              <div style="font-weight:700">Jesse Stone</div>
-              <div class="meta">Shared a memory · <span class="timestamp">2 hrs</span></div>
-            </div>
-          </div>
-          <div class="post-body">Had an amazing day building UI components — feels good to see them come alive!</div>
-          <div class="post-media"><img src="https://picsum.photos/800/400?random=1" alt="demo image" style="width:100%;height:auto;display:block"></div>
-          <div class="reactions">
-            <button class="like-btn">Like</button>
-            <button class="comment-btn">Comment</button>
-            <button class="share-btn">Share</button>
-          </div>
-          <div class="comment-section">
-            <div class="comment">
-              <img class="avatar" src="my-photo.jpg" alt="Aman Das" style="width:36px;height:36px">
-              <input class="comment-input" type="text" placeholder="Write a comment..."/>
-            </div>
-          </div>
-        </article>
-
-        <article class="card post">
-          <div class="post-head">
-            <div class="avatar">RN</div>
-            <div>
-              <div style="font-weight:700">Ramesh N.</div>
-              <div class="meta">Posted an update · <span class="timestamp">5 hrs</span></div>
-            </div>
-          </div>
-          <div class="post-body">Excited to start my new project on AI & Machine Learning 🚀</div>
-          <div class="reactions">
-            <button class="like-btn">Like</button>
-            <button class="comment-btn">Comment</button>
-            <button class="share-btn">Share</button>
-          </div>
-        </article>
-      </div>
-    </main>
-
-    <aside>
-      <div class="card">
-        <div style="font-weight:700;margin-bottom:8px">People you may know</div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div style="display:flex;gap:10px;align-items:center">
-            <div class="avatar">KC</div>
-            <div style="flex:1">
-              <div style="font-weight:700">Kriti Chhetri</div>
-              <div class="small-muted">2 mutual friends</div>
-            </div>
-            <button class="btn" style="background:#42b72a">Add</button>
-          </div>
-          <div style="display:flex;gap:10px;align-items:center">
-            <div class="avatar">RN</div>
-            <div style="flex:1">
-              <div style="font-weight:700">Ramesh N.</div>
-              <div class="small-muted">1 mutual friend</div>
-            </div>
-            <button class="btn" style="background:#42b72a">Add</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:12px">
-        <div style="font-weight:700;margin-bottom:8px">Trending</div>
-        <div class="small-muted">What's happening</div>
-        <div style="margin-top:10px">
-          <div class="trending-item">Design systems · <div class="small-muted">12k posts</div></div>
-          <div class="trending-item">PUBG Mobile Nepal · <div class="small-muted">4.3k posts</div></div>
-          <div class="trending-item">UI/UX tips · <div class="small-muted">9.1k posts</div></div>
-          <div class="trending-item">AI Research · <div class="small-muted">15k posts</div></div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:12px">
-        <div style="font-weight:700;margin-bottom:8px">Sponsored</div>
-        <img src="https://picsum.photos/300/200?random=2" alt="ad" style="width:100%;border-radius:8px;margin-top:6px">
-        <div class="small-muted" style="margin-top:6px">Check out our latest design courses now!</div>
-      </div>
-    </aside>
-  </div>
-
-  <script>
-    const feed = document.getElementById('feed');
-    const postBtn = document.getElementById('postBtn');
-    const composer = document.getElementById('composerText');
-
-    function createPostElement(name, photo, text){
-      const article = document.createElement('article');
-      article.className = 'card post';
-      article.innerHTML = `
-        <div class="post-head">
-          <img class="avatar" src="${photo}" alt="${name}">
-          <div>
-            <div style="font-weight:700">${name}</div>
-            <div class="meta">Just now · <span class="timestamp">a moment ago</span></div>
-          </div>
-        </div>
-        <div class="post-body"></div>
-        <div class="reactions">
-          <button class="like-btn">Like</button>
-          <button class="comment-btn">Comment</button>
-          <button class="share-btn">Share</button>
-        </div>
-        <div class="comment-section">
-          <div class="comment">
-            <img class="avatar" src="${photo}" alt="${name}" style="width:36px;height:36px">
-            <input class="comment-input" type="text" placeholder="Write a comment..."/>
-          </div>
-        </div>
-      `;
-      article.querySelector('.post-body').textContent = text;
-      return article;
-    }
-
-    postBtn.addEventListener('click', ()=>{
-      const text = composer.value.trim();
-      if(!text) return alert('Write something to post (demo).');
-      const p = createPostElement('Aman Das','my-photo.jpg',text);
-      feed.insertBefore(p, feed.firstChild);
-      composer.value='';
-    });
-
-    document.body.addEventListener('click', e=>{
-      if(e.target.classList.contains('like-btn')){
-        const btn = e.target;
-        if(btn.dataset.liked === '1'){
-          btn.dataset.liked = '0'; btn.textContent = 'Like';
-        } else {
-          btn.dataset.liked = '1'; btn.textContent = 'Liked';
+        // Initialize game
+        function initGame() {
+            snake = [
+                { x: 5, y: 10 },
+                { x: 4, y: 10 },
+                { x: 3, y: 10 }
+            ];
+            
+            generateFood();
+            score = 0;
+            scoreElement.textContent = score;
+            direction = 'right';
+            nextDirection = 'right';
+            gameRunning = true;
+            gameOverElement.style.display = 'none';
         }
-      }
-    });
-  </script>
+
+        // Generate food at random position
+        function generateFood() {
+            food = {
+                x: Math.floor(Math.random() * GRID_WIDTH),
+                y: Math.floor(Math.random() * GRID_HEIGHT)
+            };
+            
+            // Make sure food doesn't spawn on snake
+            for (let segment of snake) {
+                if (segment.x === food.x && segment.y === food.y) {
+                    generateFood();
+                    break;
+                }
+            }
+        }
+
+        // Game loop
+        function gameUpdate() {
+            if (!gameRunning) return;
+            
+            direction = nextDirection;
+            
+            // Move snake
+            const head = { ...snake[0] };
+            
+            switch (direction) {
+                case 'up': head.y--; break;
+                case 'down': head.y++; break;
+                case 'left': head.x--; break;
+                case 'right': head.x++; break;
+            }
+            
+            // Check for collisions
+            if (
+                head.x < 0 || head.x >= GRID_WIDTH ||
+                head.y < 0 || head.y >= GRID_HEIGHT ||
+                snake.some(segment => segment.x === head.x && segment.y === head.y)
+            ) {
+                gameOver();
+                return;
+            }
+            
+            // Add new head
+            snake.unshift(head);
+            
+            // Check for food collision
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                scoreElement.textContent = score;
+                generateFood();
+                
+                // Add visual effect for eating
+                const scoreDisplay = document.querySelector('.score-board');
+                scoreDisplay.style.animation = 'none';
+                setTimeout(() => {
+                    scoreDisplay.style.animation = 'pulse 0.3s';
+                }, 10);
+            } else {
+                // Remove tail if no food was eaten
+                snake.pop();
+            }
+            
+            // Draw game
+            draw();
+        }
+
+        // Draw game state
+        function draw() {
+            // Clear canvas
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw grid
+            ctx.strokeStyle = '#222';
+            ctx.lineWidth = 0.5;
+            for (let x = 0; x <= canvas.width; x += GRID_SIZE) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y <= canvas.height; y += GRID_SIZE) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Draw snake
+            snake.forEach((segment, index) => {
+                const size = GRID_SIZE - 2;
+                const x = segment.x * GRID_SIZE + 1;
+                const y = segment.y * GRID_SIZE + 1;
+                
+                // Head is brighter green
+                if (index === 0) {
+                    ctx.fillStyle = '#00ff00';
+                } else {
+                    // Gradient from head to tail
+                    const gradient = ctx.createLinearGradient(
+                        x, y, x + size, y + size
+                    );
+                    const alpha = 1 - (index / snake.length) * 0.7;
+                    gradient.addColorStop(0, `rgba(0, 255, 0, ${alpha})`);
+                    gradient.addColorStop(1, `rgba(0, 200, 0, ${alpha})`);
+                    ctx.fillStyle = gradient;
+                }
+                
+                // Rounded corners for snake segments
+                ctx.beginPath();
+                ctx.roundRect(x, y, size, size, 4);
+                ctx.fill();
+            });
+            
+            // Draw food
+            const foodSize = GRID_SIZE - 4;
+            const foodX = food.x * GRID_SIZE + 2;
+            const foodY = food.y * GRID_SIZE + 2;
+            
+            // Create gradient for food
+            const gradient = ctx.createRadialGradient(
+                foodX + foodSize/2, foodY + foodSize/2, 0,
+                foodX + foodSize/2, foodY + foodSize/2, foodSize/2
+            );
+            gradient.addColorStop(0, '#ff6b6b');
+            gradient.addColorStop(1, '#ff4444');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(foodX + foodSize/2, foodY + foodSize/2, foodSize/2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Game over
+        function gameOver() {
+            gameRunning = false;
+            clearInterval(gameLoop);
+            finalScoreElement.textContent = score;
+            gameOverElement.style.display = 'block';
+        }
+
+        // Restart game
+        function restartGame() {
+            initGame();
+            startGame();
+        }
+
+        // Start game loop
+        function startGame() {
+            gameLoop = setInterval(gameUpdate, GAME_SPEED);
+        }
+
+        // Set direction with validation
+        function setDirection(newDirection) {
+            // Prevent 180-degree turns
+            if (
+                (direction === 'up' && newDirection === 'down') ||
+                (direction === 'down' && newDirection === 'up') ||
+                (direction === 'left' && newDirection === 'right') ||
+                (direction === 'right' && newDirection === 'left')
+            ) {
+                return;
+            }
+            nextDirection = newDirection;
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowUp': setDirection('up'); break;
+                case 'ArrowDown': setDirection('down'); break;
+                case 'ArrowLeft': setDirection('left'); break;
+                case 'ArrowRight': setDirection('right'); break;
+                case ' ': if (!gameRunning) restartGame(); break;
+            }
+        });
+
+        // Touch controls for mobile
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        canvas.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            e.preventDefault();
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        });
+
+        canvas.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            
+            const dx = touchEndX - touchStartX;
+            const dy = touchEndY - touchStartY;
+            
+            if (Math.abs(dx) > Math.abs(dy)) {
+                // Horizontal swipe
+                if (dx > 0) setDirection('right');
+                else setDirection('left');
+            } else {
+                // Vertical swipe
+                if (dy > 0) setDirection('down');
+                else setDirection('up');
+            }
+            
+            e.preventDefault();
+        });
+
+        // Initialize and start the game
+        window.onload = function() {
+            initGame();
+            startGame();
+        };
+    </script>
 </body>
 </html>
+
