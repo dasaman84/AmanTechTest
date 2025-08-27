@@ -1,14 +1,250 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MyBook — Social Feed (Demo)</title>
+  <style>
+    /* Reset + base */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:#f0f2f5;color:#1c1e21}
+    a{color:inherit;text-decoration:none}
+
+    /* Page grid */
+    .topbar{height:60px;background:#4267B2;color:white;display:flex;align-items:center;padding:0 16px;gap:12px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
+    .brand .logo{width:36px;height:36px;border-radius:6px;background:linear-gradient(135deg,#ff6a00,#ffcc00);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+
+    .topbar .search{flex:1;display:flex;justify-content:center}
+    .search input{width:60%;max-width:520px;padding:8px 12px;border-radius:20px;border:none;outline:none}
+
+    .top-actions{display:flex;gap:10px;align-items:center}
+    .icon-btn{background:rgba(255,255,255,0.15);padding:8px;border-radius:8px;cursor:pointer}
+
+    /* Main layout */
+    .container{display:grid;grid-template-columns:260px 1fr 320px;gap:20px;max-width:1150px;margin:18px auto;padding:0 12px}
+
+    /* Left column */
+    .card{background:white;border-radius:10px;padding:14px;box-shadow:0 1px 2px rgba(0,0,0,0.05)}
+    .profile-mini{display:flex;gap:12px;align-items:center}
+    .avatar{width:56px;height:56px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-weight:700;color:#555}
+    .name{font-weight:700}
+    .small-muted{color:#666;font-size:13px}
+    .menu{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+    .menu a{padding:8px;border-radius:8px;color:#1c1e21}
+    .menu a:hover{background:#f0f2f5}
+
+    /* Center feed */
+    .composer{display:flex;gap:12px;align-items:flex-start}
+    .composer textarea{flex:1;border-radius:10px;padding:12px;border:1px solid #e1e3e6;min-height:64px;resize:vertical}
+    .composer .composer-actions{display:flex;flex-direction:column;gap:8px}
+    .btn{padding:8px 12px;border-radius:8px;border:none;background:#1877F2;color:white;cursor:pointer}
+    .post{margin-top:16px}
+    .post .post-head{display:flex;gap:12px;align-items:center}
+    .post .post-body{margin-top:10px;font-size:15px;line-height:1.45}
+    .post .post-media{margin-top:10px;border-radius:8px;overflow:hidden}
+    .meta{color:#65676b;font-size:13px}
+    .reactions{display:flex;gap:12px;margin-top:10px;color:#65676b}
+    .reactions button{background:transparent;border:none;cursor:pointer;padding:6px 8px;border-radius:6px}
+
+    /* Right column */
+    .trending-item{padding:8px 0;border-bottom:1px solid #f1f2f3}
+    .trending-item:last-child{border-bottom:none}
+
+    /* Responsive */
+    @media (max-width:1000px){
+      .container{grid-template-columns:1fr;max-width:760px}
+      .topbar .search input{width:90%}
+      .top-actions{display:none}
+    }
+
+    /* Small fancy touches */
+    .timestamp{color:#8a8d91;font-size:12px}
+    .pill{display:inline-block;padding:6px 8px;border-radius:999px;background:#eef3ff;color:#2d56a6;font-weight:600;font-size:12px}
+
+  </style>
 </head>
 <body>
-    <div>
-        <h1>Aman Das Ambition Guru</h1>
-        <p>It is test devlopment</p>
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">MB</div>
+      <div>MyBook</div>
     </div>
+
+    <div class="search">
+      <input type="search" placeholder="Search MyBook" aria-label="Search">
+    </div>
+
+    <div class="top-actions">
+      <div class="icon-btn">Home</div>
+      <div class="icon-btn">Profile</div>
+      <div class="icon-btn">Messages</div>
+      <div class="icon-btn">Notifications</div>
+    </div>
+  </div>
+
+  <!-- Main container -->
+  <div class="container">
+
+    <!-- Left: profile + shortcuts -->
+    <aside>
+      <div class="card">
+        <div class="profile-mini">
+          <div class="avatar">AD</div>
+          <div>
+            <div class="name">Aman Das</div>
+            <div class="small-muted">View profile</div>
+          </div>
+        </div>
+        <div class="menu">
+          <a href="#">Friends</a>
+          <a href="#">Groups</a>
+          <a href="#">Marketplace</a>
+          <a href="#">Saved</a>
+          <a href="#">Pages</a>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div style="font-weight:700;margin-bottom:8px">Shortcuts</div>
+        <div class="small-muted">Your most visited groups & pages</div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-direction:column">
+          <a href="#">Design Club</a>
+          <a href="#">PUBG Squad</a>
+          <a href="#">College Noticeboard</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Center: composer + feed -->
+    <main>
+      <div class="card">
+        <div class="composer">
+          <div class="avatar">AD</div>
+          <div style="flex:1">
+            <textarea id="composerText" placeholder="What's on your mind? (demo)" aria-label="Create post"></textarea>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+              <div style="display:flex;gap:8px;align-items:center">
+                <button class="pill" id="photoBtn">Photo</button>
+                <button class="pill" id="checkinBtn">Check in</button>
+              </div>
+              <div class="composer-actions">
+                <button class="btn" id="postBtn">Post</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feed area (posts will be inserted here) -->
+      <div id="feed">
+        <!-- Sample post (static) -->
+        <article class="card post">
+          <div class="post-head">
+            <div class="avatar">JS</div>
+            <div>
+              <div style="font-weight:700">Jesse Stone</div>
+              <div class="meta">Shared a memory · <span class="timestamp">2 hrs</span></div>
+            </div>
+          </div>
+          <div class="post-body">Had an amazing day building UI components — feels good to see them come alive!</div>
+          <div class="post-media"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='400'><rect width='100%' height='100%' fill='%23dbeafe'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='28' fill='%234263b2'>Sample Image</text></svg>" alt="demo image" style="width:100%;height:auto;display:block"></div>
+          <div class="reactions">
+            <button class="like-btn">Like</button>
+            <button class="comment-btn">Comment</button>
+            <button class="share-btn">Share</button>
+          </div>
+        </article>
+
+      </div>
+
+    </main>
+
+    <!-- Right: trends / suggestions -->
+    <aside>
+      <div class="card">
+        <div style="font-weight:700;margin-bottom:8px">People you may know</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="avatar">KC</div>
+            <div style="flex:1">
+              <div style="font-weight:700">Kriti Chhetri</div>
+              <div class="small-muted">2 mutual friends</div>
+            </div>
+            <button class="btn" style="background:#42b72a">Add</button>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="avatar">RN</div>
+            <div style="flex:1">
+              <div style="font-weight:700">Ramesh N.</div>
+              <div class="small-muted">1 mutual friend</div>
+            </div>
+            <button class="btn" style="background:#42b72a">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div style="font-weight:700;margin-bottom:8px">Trending</div>
+        <div class="small-muted">What's happening</div>
+        <div style="margin-top:10px">
+          <div class="trending-item">Design systems · <div class="small-muted">12k posts</div></div>
+          <div class="trending-item">PUBG Mobile Nepal · <div class="small-muted">4.3k posts</div></div>
+          <div class="trending-item">UI/UX tips · <div class="small-muted">9.1k posts</div></div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <script>
+    // Minimal client-side behavior so the demo feels alive.
+    const feed = document.getElementById('feed');
+    const postBtn = document.getElementById('postBtn');
+    const composer = document.getElementById('composerText');
+
+    function createPostElement(name, initials, text){
+      const article = document.createElement('article');
+      article.className = 'card post';
+      article.innerHTML = `
+        <div class="post-head">
+          <div class="avatar">${initials}</div>
+          <div>
+            <div style="font-weight:700">${name}</div>
+            <div class="meta">Just now · <span class="timestamp">a moment ago</span></div>
+          </div>
+        </div>
+        <div class="post-body"></div>
+        <div class="reactions">
+          <button class="like-btn">Like</button>
+          <button class="comment-btn">Comment</button>
+          <button class="share-btn">Share</button>
+        </div>
+      `;
+      article.querySelector('.post-body').textContent = text;
+      return article;
+    }
+
+    postBtn.addEventListener('click', ()=>{
+      const text = composer.value.trim();
+      if(!text) return alert('Write something to post (demo).');
+      const p = createPostElement('Aman Das','AD',text);
+      feed.insertBefore(p, feed.firstChild);
+      composer.value='';
+    });
+
+    // Simple event delegation for like buttons
+    document.body.addEventListener('click', e=>{
+      if(e.target.classList.contains('like-btn')){
+        const btn = e.target;
+        if(btn.dataset.liked === '1'){
+          btn.dataset.liked = '0'; btn.textContent = 'Like';
+        } else {
+          btn.dataset.liked = '1'; btn.textContent = 'Liked';
+        }
+      }
+    });
+  </script>
 </body>
 </html>
